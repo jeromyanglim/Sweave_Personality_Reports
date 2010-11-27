@@ -1,20 +1,14 @@
-output = .output
+outputDir = .output
 rnwfile = Report_Template
-backup = .backup
+backupDir = .backup
 
 all:
-	-mkdir $(output)
-	-cp $(rnwfile).Rnw
-	cd $(output); R CMD Sweave $(rnwfile).Rnw
-	-cp *.sty $(output)
-	cd $(output); texify --run-viewer --pdf $(rnwfile).tex 
-
-tex:
-	cd $(output); texify --run-viewer --pdf $(rnwfile).tex
+	-mkdir $(outputDir)
+	Rscript --verbose main.R  
 
 clean:
-	-rm $(output)/*
+	-rm $(outputDir)/*
 	
 backup:
-	-mkdir $(backup)
-	cp 	$(output)/$(rnwfile).pdf $(backup)/$(rnwfile).pdf 
+	-mkdir $(backupDir)
+	cp 	$(outputDir)/*.pdf --target-directory=$(backupDir) 
