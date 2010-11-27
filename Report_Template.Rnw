@@ -1,0 +1,139 @@
+%
+<<import data>>=
+source("main.R")
+
+# usally the i value will be specified by the makefile
+# but if it is not, make i = 1 
+if(!any(ls() %in% "i")) i <- 1
+
+id <- ipip$id[i] # specify the active ID
+@
+ \documentclass[a4paper]{article}
+\usepackage[OT1]{fontenc}
+\usepackage{Sweave}
+\usepackage{chngpage} % allows use of adjust width
+\SweaveOpts{echo=FALSE}
+\setkeys{Gin}{width=0.8\textwidth}
+\usepackage{hyperref}            % for links (only use on final printed version
+\usepackage{booktabs}
+\usepackage[left=40mm, right=40mm, top=30mm, bottom=30mm, includefoot, headheight=13.6pt]{geometry} %set margins to be 30mm (needs to include page numbers
+\hypersetup{pdfpagelayout=SinglePage} % http://www.tug.org/applications/hyperref/ftp/doc/manual.html                                
+\hypersetup{
+    colorlinks,%
+    citecolor=black,%
+    filecolor=black,%
+    linkcolor=black,%
+    urlcolor=black
+} % have links but print liek standard text http://en.wikibooks.org/wiki/LaTeX/Hyperlinks
+
+\begin{document}
+\title{Sweave Example: Example Personality Test Report;
+ ID = \Sexpr{id}}
+\author{Author: Jeromy Anglim}
+
+\maketitle
+
+<<plot_scale_distributions, fig=true>>=
+#plotScale <- function(ipipscale) {
+#	ggplot(ipip, aes_string(x=ipipscale["scale"])) + 
+#		scale_x_continuous(limits=c(1, 5),
+#			name = ipipscale["name"]) +
+#		scale_y_continuous(name = "", labels ="",	breaks = 0) +
+#		geom_density(fill="green", alpha = .5) +
+#		geom_vline(xintercept = ipip[ipip$id %in% id, ipipscale["scale"]],
+#				size=1) 
+#
+#}
+#
+#scaleplots <-	apply(ipipscales, 1, function(X) plotScale(X))
+#
+#arrange(scaleplots[[1]], 
+#		scaleplots[[2]],
+#		scaleplots[[3]],
+#		scaleplots[[4]],
+#		scaleplots[[5]],
+#		ncol=3)
+@
+Figure of distribution of scores on each scale.
+Black vertical line indicates your score.
+
+<<prepare_table>>=
+ipiptable <- list()
+ipiptable$colnames <- c("item", "scaleF", "text", "meanF",
+		"sdF", "is1F", "is2F", "is3F", "is4F", "is5F")
+ipiptable$cells <- ipipsummary[,ipiptable$colnames ]
+ipiptable$cells$item <- paste(ipiptable$cells$item, ".", sep="")
+
+# assign actual respones to table
+ipiptable$cells$response <- 
+		c("VI", "MI", "N", "MA", "VA")[as.numeric(ipip[ipip$id %in% id, ipipmeta$variable])] 
+
+ipiptable$cellsF <- as.matrix(ipiptable$cells) 
+
+ipiptable$cellsF <- ipiptable$cellsF[order(ipiptable$cellsF[, "scaleF"]), ]
+
+ipiptable$row1 <- c("", "Scale", "Item Text", 
+		"M", "SD", "VI\\%", "MI\\%", "N\\%", "MA\\%", "VA\\%", "Response")
+
+ipiptable$table <- rbind(ipiptable$row1, ipiptable$cellsF)
+ipiptable$tex <- paste(
+		apply(ipiptable$table, 1, function(X) paste(X, collapse = " & ")), 
+		"\\\\")
+for(i in c(41, 31, 21, 11, 1)) {
+	ipiptable$tex <- append(ipiptable$tex, "\\midrule", after=i)
+}
+ipiptable$tex1 <- ipiptable$tex[c(1:34)]
+ipiptable$tex2 <- ipiptable$tex[c(1,35:56)]
+@
+
+\begin{table}
+\begin{adjustwidth}{-1cm}{-1cm}
+Table of results for (A)greeableness, (C)onscientiousness
+and (E)motional (S)tability items.
+
+Response options were 
+1 = (V)ery (I)naccurate, 
+2 = (M)oderately (I)naccurate,
+3 = (N)either Inaccurate nor Accurate, 
+4 = (M)oderately (A)ccurate
+5 = (V)ery (A)ccurate.
+Thus, VI\% indicates the percentage of the norm sample 
+giving a response indicating that the item is a Very Inaccurate
+description of themselves.
+
+Response indicates your response to the questionnaire. 
+
+\begin{center}
+\begin{tabular}{rrp{4cm}rrrrrrrr}
+\toprule
+<<table_part1, results=tex>>=
+cat(ipiptable$tex1, sep="\n") 
+@
+\bottomrule
+\end{tabular}
+\end{center}
+\end{adjustwidth}
+\end{table}
+
+\begin{table}
+\begin{adjustwidth}{-1cm}{-1cm}
+\begin{center}
+\begin{tabular}{rrp{4cm}rrrrrrrr}
+\toprule
+<<table_part1, results=tex>>=
+cat(ipiptable$tex2, sep="\n") 
+@
+\bottomrule
+\end{tabular}
+\end{center}
+\end{adjustwidth}
+\end{table}
+
+
+
+
+
+
+
+
+\end{document}
