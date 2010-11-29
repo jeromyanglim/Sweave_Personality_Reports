@@ -1,6 +1,3 @@
-# ensures that at least a case is printed if nothing else is specified
-if(!any(ls() %in% "ids")) ids <- 1  
-
 # Settings and import statements
 options(stringsAsFactors = FALSE)
 library(psych)
@@ -50,20 +47,3 @@ ipipsummary$is5F <- format(round(ipipsummary$is5))
 ipipsummary$scaleF <- ifelse(ipipsummary$reverse == 1, 
 		paste(ipipsummary$scale, "+", sep =""),
 		paste(ipipsummary$scale, "-", sep =""))
-
-i <- 1
-ids <- ipip$id[i] # specify the active ID
-
-for (i in ids) {
-	id <- ids[i]
-	fileStem <- "Report_Template"
-	file.copy("Report_Template.Rnw",
-			paste(".output/", fileStem, "_ID", id, ".Rnw", sep =""),
-			overwrite = TRUE)
-	file.copy("Sweave.sty", ".output/Sweave.sty", overwrite = TRUE)
-	setwd(".output")
-	Sweave(paste(fileStem, "_ID", id, ".Rnw", sep =""))
-	tools::texi2dvi(paste(fileStem, "_ID", id, ".tex", sep =""), pdf = TRUE)
-	setwd("..")
-}
-

@@ -77,15 +77,19 @@ ipiptable$cells <- ipipsummary[,ipiptable$colnames ]
 ipiptable$cells$item <- paste(ipiptable$cells$item, ".", sep="")
 
 # assign actual respones to table
-ipiptable$cells$response <- 
-		c("VI", "MI", "N", "MA", "VA")[as.numeric(ipip[ipip$id %in% id, ipipmeta$variable])] 
+ipiptable$cells[,c("is1F", "is2F", "is3F", "is4F", "is5F")] <-
+		sapply(1:5, function(X)
+		ifelse(as.numeric(ipip[ipip$id %in% id, ipipmeta$variable]) == X, 
+				paste("*", ipiptable$cells[[paste("is", X, "F", sep ="")]], sep =""),
+				ipiptable$cells[[paste("is", X, "F", sep ="")]]))
+
 
 ipiptable$cellsF <- as.matrix(ipiptable$cells) 
 
 ipiptable$cellsF <- ipiptable$cellsF[order(ipiptable$cellsF[, "scaleF"]), ]
 
 ipiptable$row1 <- c("", "Scale", "Item Text", 
-		"M", "SD", "VI\\%", "MI\\%", "N\\%", "MA\\%", "VA\\%", "Response")
+		"M", "SD", "VI\\%", "MI\\%", "N\\%", "MA\\%", "VA\\%")
 
 ipiptable$table <- rbind(ipiptable$row1, ipiptable$cellsF)
 ipiptable$tex <- paste(
@@ -96,6 +100,18 @@ for(i in c(41, 31, 21, 11, 1)) {
 }
 ipiptable$tex1 <- ipiptable$tex[c(1:34)]
 ipiptable$tex2 <- ipiptable$tex[c(1,35:56)]
+
+ipiptable$caption <-
+		"Response options were 
+1 = (V)ery (I)naccurate, 
+2 = (M)oderately (I)naccurate,
+3 = (N)either Inaccurate nor Accurate, 
+4 = (M)oderately (A)ccurate
+5 = (V)ery (A)ccurate.
+Thus, VI\\\\% indicates the percentage of the norm sample 
+		giving a response indicating that the item is a Very Inaccurate
+description of themselves.
+Your response is indicated with an asterisk (*)."
 @
 
 
@@ -104,19 +120,9 @@ ipiptable$tex2 <- ipiptable$tex[c(1,35:56)]
 \begin{adjustwidth}{-1cm}{-1cm}
 \caption{Table of results for (A)greeableness, (C)onscientiousness
 and (E)motional (S)tability items.
-Response options were 
-1 = (V)ery (I)naccurate, 
-2 = (M)oderately (I)naccurate,
-3 = (N)either Inaccurate nor Accurate, 
-4 = (M)oderately (A)ccurate
-5 = (V)ery (A)ccurate.
-Thus, VI\% indicates the percentage of the norm sample 
-giving a response indicating that the item is a Very Inaccurate
-description of themselves.
-Response indicates your response to the questionnaire.} 
-
+\Sexpr{ipiptable[["caption"]]}} 
 \begin{center}
-\begin{tabular}{rrp{4cm}rrrrrrrr}
+\begin{tabular}{rrp{4cm}rrrrrrr}
 \toprule
 <<table_part1, results=tex>>=
 cat(ipiptable$tex1, sep="\n") 
@@ -129,19 +135,10 @@ cat(ipiptable$tex1, sep="\n")
 
 \begin{table}
 \begin{adjustwidth}{-1cm}{-1cm}
-\caption{Table of results for (EX)traversion and (I)ntellectance items.
-Response options were 
-1 = (V)ery (I)naccurate, 
-2 = (M)oderately (I)naccurate,
-3 = (N)either Inaccurate nor Accurate, 
-4 = (M)oderately (A)ccurate
-5 = (V)ery (A)ccurate.
-Thus, VI\% indicates the percentage of the norm sample 
-giving a response indicating that the item is a Very Inaccurate
-description of themselves.
-The response column indicates the response you gave in the questionnaire.}
+\caption{Table of results for (E)xtraversion and (I)ntellectance.
+\Sexpr{ipiptable[["caption"]]}}
 \begin{center}
-\begin{tabular}{rrp{4cm}rrrrrrrr}
+\begin{tabular}{rrp{4cm}rrrrrrr}
 \toprule
 <<table_part1, results=tex>>=
 cat(ipiptable$tex2, sep="\n") 
