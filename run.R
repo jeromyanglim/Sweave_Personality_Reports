@@ -7,7 +7,7 @@
 
 
 source("main.R", echo = TRUE)
-
+id <- NULL
 exportReport <- function(x) {
 	id <<- x
 	fileStem <- "Report_Template"

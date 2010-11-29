@@ -151,9 +151,4 @@ cat(ipiptable$tex2, sep="\n")
 
 
 
-
-
-
-
-
 \end{document}
